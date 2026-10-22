@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ms"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>Misi Eksplorasi Anti-Inhalan: Rahsia Galeri Terlarang</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:#05061a;color:#fff;font-family:"Trebuchet MS",Verdana,sans-serif;overflow:hidden;touch-action:none}
+#app{position:relative;height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:1100px;margin:auto}
+.hide{display:none!important}
+button{font:inherit;font-weight:700;background:#f2c94c;color:#1a1a3a;border:0;border-bottom:4px solid #b8942a;border-radius:10px;padding:9px 13px;margin:4px;cursor:pointer}
+button:active{transform:translateY(2px)}button.on{background:#7ee0ff}button.x{background:#e8e8f5}button.ok{background:#6fe39a}
+#hud{display:none;gap:6px;align-items:center;padding:4px 8px;background:#0d1030;border-bottom:3px solid #f2c94c}
+body.play #hud{display:flex}#hud button{padding:6px 9px;margin:0;font-size:13px}
+#info{flex:1;min-width:0}#obj{font-size:13px;font-weight:700;color:#ffe9a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bar{height:10px;background:#272b66;border-radius:6px;margin-top:4px;overflow:hidden;border:1px solid #f2c94c}
+#fill{display:block;height:100%;width:0;background:linear-gradient(90deg,#4cd6a0,#f2c94c);transition:width .5s}
+#c{flex:1;min-height:0;width:100%;object-fit:contain;image-rendering:pixelated;background:#05061a}
+#prompt{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(13,16,48,.92);border:2px solid #f2c94c;border-radius:20px;padding:7px 16px;font-weight:700;font-size:15px;white-space:nowrap}
+#toast{position:absolute;left:50%;top:62px;transform:translateX(-50%);background:#f2c94c;color:#1a1a3a;border-radius:20px;padding:8px 18px;font-weight:700;animation:pop 2.6s forwards;text-align:center}
+@keyframes pop{0%{opacity:0;top:40px}12%{opacity:1;top:62px}85%{opacity:1}100%{opacity:0}}
+#pad{display:none;position:absolute;left:0;right:0;bottom:8px;justify-content:space-between;align-items:flex-end;padding:0 14px;pointer-events:none}
+#dp{display:grid;grid-template-columns:repeat(3,56px);grid-auto-rows:56px;gap:2px}
+#dp button,#bE{pointer-events:auto;margin:0;opacity:.85;touch-action:none;border-radius:50%;padding:0;font-size:20px}
+#bE{width:74px;height:74px;font-size:28px;background:#6fe39a;border-bottom-color:#2b9d5c}
+@media(pointer:coarse){body.play:not(.modal) #pad{display:flex}#prompt{bottom:90px}}
+#panel{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:10px;background:rgba(3,4,20,.35)}
+#box{width:min(560px,100%);max-height:70%;overflow:auto;background:linear-gradient(#1a1f55,#0d1030);border:3px solid #f2c94c;border-radius:14px;padding:12px 16px;box-shadow:0 0 30px #000}
+#box h2{margin:0 0 6px;color:#ffd54a;font-size:20px}#pb{font-size:16px;line-height:1.45}#pb p{margin:6px 0}
+#pbtn{text-align:right}#ic{float:left;margin:0 12px 4px 0;background:#10143a;border:2px solid #f2c94c;border-radius:10px;image-rendering:pixelated}
+.new{color:#6fe39a;font-weight:700;clear:both}.bad{color:#ffb199}.good{color:#6fe39a}
+#start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:12px;background:radial-gradient(circle,rgba(12,14,60,.5),rgba(3,4,20,.92))}
+body.play #start{display:none}
+#start h1{margin:0;font-size:clamp(26px,6vw,52px);color:#ffd54a;text-shadow:0 4px 0 #7a5a00,0 0 24px #a77bff;line-height:1.05}
+#start h2{margin:2px 0 12px;font-size:clamp(14px,3vw,22px);color:#a8e6ff}.sub{margin:0;color:#c9b8ff;font-weight:700}
+.big{font-size:22px;padding:12px 30px}
+</style></head>
+<body>
+<div id="app">
+ <div id="hud">
+  <div id="info"><div id="obj"></div><div id="bar"><i id="fill"></i></div></div>
+  <button id="bBook">Buku Ilmu</button><button class="snd">Bunyi: ON</button><button id="bMenu">Jeda</button>
+ </div>
+ <canvas id="c" width="480" height="320"></canvas>
+ <div id="prompt" class="hide"></div><div id="toast" class="hide"></div>
+ <div id="pad">
+  <div id="dp"><b></b><button data-k="u">&#9650;</button><b></b><button data-k="l">&#9664;</button><b></b><button data-k="r">&#9654;</button><b></b><button data-k="d">&#9660;</button><b></b></div>
+  <button id="bE">E</button>
+ </div>
+ <div id="panel" class="hide"><div id="box"><h2 id="pt"></h2><div id="pb"></div><div id="pbtn"></div></div></div>
+ <div id="start">
+  <p class="sub">Pendidikan Kesihatan Tahun 3</p>
+  <h1>MISI EKSPLORASI<br>ANTI-INHALAN</h1><h2>Rahsia Galeri Terlarang</h2>
+  <button id="bStart" class="big">MULA MISI</button>
+  <button id="bCont" class="big hide">SAMBUNG MISI</button>
+  <div><button id="bHow">CARA BERMAIN</button><button id="bAbout">TENTANG PERMAINAN</button><button class="snd">Bunyi: ON</button></div>
+ </div>
+</div>
+<script>
+'use strict';
+const T=32,VW=480,VH=320,KEY='misi-inhalan-v1',$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d');
+const R_=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),w,h)};
+/* ===== KANDUNGAN PEMBELAJARAN ===== */
+const EX={
+gam:{t:'Gam Pelarut',d:'Sesetengah gam mengandungi bahan pelarut. Bahan ini boleh menghasilkan wap yang berbahaya jika disalahgunakan. Gam hanya untuk kraf, digunakan mengikut arahan dan dengan bantuan orang dewasa. Ingat: bukan semua gam mempunyai kandungan yang sama.'},
+petrol:{t:'Petrol',d:'Petrol ialah bahan api untuk kenderaan. Ia mudah meruap dan wapnya berbahaya. Petrol bukan mainan dan bukan untuk dihidu. Orang dewasa sahaja yang boleh mengendalikannya.'},
+thinner:{t:'Thinner Cat',d:'Thinner digunakan untuk mencairkan cat dan membersihkan berus. Ia mengeluarkan wap kimia yang kuat dan berbahaya. Hanya orang dewasa boleh menggunakannya di tempat yang berudara.'},
+aerosol:{t:'Produk Aerosol',d:'Sesetengah produk semburan seperti pewangi atau penyembur serangga mengandungi bahan kimia meruap. Gunakan mengikut label oleh orang dewasa. Jangan sembur ke muka dan jangan disalahgunakan.'}};
+const ST={
+kepala:{t:'Pening dan Sakit Kepala',d:'Wap bahan inhalan boleh membuat badan berasa pening dan kepala menjadi sakit.',c:'#ff8a5c'},
+perut:{t:'Loya dan Muntah',d:'Perut berasa tidak selesa. Badan boleh berasa loya dan muntah.',c:'#ffd54a'},
+paru:{t:'Gangguan Pernafasan',d:'Paru-paru dan saluran pernafasan terganggu. Kita boleh batuk dan sukar bernafas.',c:'#5ad0ff'},
+otak:{t:'Otak dan Sistem Saraf',d:'Otak dan saraf boleh rosak. Murid sukar berfikir, mengingat dan mengawal badan.',c:'#ff7ac0'},
+organ:{t:'Kerosakan Organ Badan',d:'Organ penting seperti hati dan buah pinggang boleh rosak jika penyalahgunaan berlaku berulang kali.',c:'#c9a0ff'},
+pengsan:{t:'Pengsan dan Risiko Kematian',d:'Seseorang boleh pengsan dan dalam keadaan teruk boleh membawa maut. Segera minta bantuan orang dewasa!',c:'#ff6060'}};
+const SC=[
+{f:'Rakan: "Hei! Ada gam dalam beg aku. Jom cuba hidu, seronok tahu!"',tip:'Berkata TIDAK dengan tegas: "Tidak, saya tidak mahu. Bahan itu membahayakan kesihatan."',
+ o:[['Okey, sekejap sahaja.',0,'Itu berbahaya. Wap bahan kimia boleh merosakkan badan kita. Cuba lagi.'],['"Tidak, saya tidak mahu. Bahan itu membahayakan kesihatan."',1,'Hebat! Kamu berkata TIDAK dengan yakin. Kamu tidak perlu rasa bersalah.'],['Diam sahaja dan ikut rakan.',0,'Diam boleh membuat kita ikut tanpa sedar. Kita perlu berkata TIDAK. Cuba lagi.']]},
+{f:'Rakan: "Semua orang buat! Kau penakut ke?"',tip:'Beredar dari situasi berbahaya dengan tenang.',
+ o:[['Ketawa dan cuba sedikit.',0,'Tidak selamat! Tekanan rakan tidak boleh membuat kita buat perkara berbahaya.'],['Beredar dari situ dengan tenang.',1,'Bagus! Beredar ialah tindakan berani dan selamat.'],['Bergaduh dengan rakan.',0,'Bergaduh tidak menyelesaikan masalah. Lebih baik beredar. Cuba lagi.']]},
+{f:'Kamu nampak rakan memegang botol thinner dan mahu bermain dengannya.',tip:'Beritahu guru, ibu bapa atau orang dewasa yang dipercayai.',
+ o:[['Rahsiakan sahaja.',0,'Rakan mungkin dalam bahaya. Kita perlu beritahu orang dewasa.'],['Beritahu guru atau ibu bapa dengan segera.',1,'Tepat! Orang dewasa yang dipercayai boleh membantu kita dan rakan.'],['Cuba rampas botol itu sendiri.',0,'Itu berisiko. Minta bantuan orang dewasa. Cuba lagi.']]}];
+const CL=['Simbol Perisai','Simbol Hati','Simbol Bintang','Simbol Kunci'];
+const Q=[
+['Antara berikut, yang manakah mungkin mengandungi bahan inhalan?',['Thinner cat','Air minuman','Nasi'],0,'Thinner cat mengeluarkan wap kimia yang berbahaya.'],
+['Petrol ialah bahan yang...',['Selamat untuk dihidu','Mudah meruap dan wapnya berbahaya','Makanan haiwan'],1,'Petrol mudah meruap dan wapnya berbahaya.'],
+['Adakah semua gam mempunyai kandungan yang sama?',['Ya, semua sama','Tidak, hanya sesetengah mengandungi pelarut','Gam boleh diminum'],1,'Hanya sesetengah gam mengandungi pelarut.'],
+['Produk aerosol patut digunakan oleh siapa?',['Orang dewasa mengikut label','Kanak-kanak sebagai mainan','Murid ke muka rakan'],0,'Aerosol perlu digunakan mengikut label oleh orang dewasa.'],
+['Apakah kesan penyalahgunaan inhalan pada badan?',['Badan jadi lebih kuat','Pening dan sakit kepala','Menjadi pandai membaca'],1,'Pening, sakit kepala dan loya ialah kesan yang berbahaya.'],
+['Bahagian badan manakah boleh rosak?',['Otak dan sistem saraf','Rambut sahaja','Kuku sahaja'],0,'Otak, saraf, paru-paru dan organ lain boleh rosak.'],
+['Jika penyalahgunaan sangat teruk, apa yang boleh berlaku?',['Pengsan dan bahaya maut','Menjadi lebih tinggi','Cepat pandai'],0,'Seseorang boleh pengsan dan boleh membawa maut.'],
+['Rakan mengajak kamu menghidu gam. Apa kamu katakan?',['"Okey, sekejap sahaja."','"Tidak, saya tidak mahu. Bahan itu membahayakan kesihatan."','"Nanti dululah."'],1,'Katakan TIDAK dengan jelas dan tegas.'],
+['Rakan terus memaksa kamu. Apa tindakan yang selamat?',['Beredar dan cari orang dewasa','Ikut sahaja','Rahsiakan'],0,'Beredar dan dapatkan bantuan orang dewasa.'],
+['Siapakah yang boleh membantu kita?',['Guru atau ibu bapa','Orang yang tidak dikenali','Tiada siapa'],0,'Guru, ibu bapa dan orang dewasa yang dipercayai boleh membantu.']];
+/* ===== DUNIA ===== */
+const R={
+lobi:{n:'Lobi Misteri',w:22,h:14,a:['#1c2160','#252b78'],wl:'#0b0d2e',ac:'#f2c94c',
+ D:[[3,0,'B',8,9,'Galeri Inhalan'],[10,0,'C',9,10,'Galeri Kesan'],[17,0,'D',7,8,'Bilik TIDAK'],[10,13,'E',7,8,'Kuiz Akhir']],
+ O:[['rug',8,5,'6x4'],['npc',11,4,'guard'],['board',6,2,''],['map',15,2,''],['chest',19,11,'cl0'],['plant',1,1],['plant',20,1],['plant',1,12],['plant',20,12],['lamp',8,1],['lamp',13,1],['bench',4,8],['bench',16,8],['table',2,5],['table',19,5]]},
+B:{n:'Galeri Kenali Bahan Inhalan',w:16,h:11,a:['#1d5c63','#246b73'],wl:'#10333a',ac:'#f5d33f',
+ D:[[8,10,'lobi',3,1,'Lobi']],
+ O:[['rug',5,4,'6x3'],['ex',3,3,'gam'],['ex',12,3,'petrol'],['ex',3,7,'thinner'],['ex',12,7,'aerosol'],['shelf',6,1],['shelf',9,1],['plant',1,1],['plant',14,1],['lamp',4,1],['lamp',11,1],['clue',14,9,'cl1']]},
+C:{n:'Galeri Kesan Terhadap Kesihatan',w:18,h:12,a:['#5a2a4a','#6b3350'],wl:'#2a1126',ac:'#ff8a5c',
+ D:[[9,11,'lobi',10,1,'Lobi']],
+ O:[['rug',6,5,'6x2'],['st',3,3,'kepala'],['st',8,3,'perut'],['st',13,3,'paru'],['st',3,7,'otak'],['st',8,7,'organ'],['st',13,7,'pengsan'],['plant',1,1],['plant',16,1],['lamp',6,1],['lamp',11,1],['clue',16,10,'cl2']]},
+D:{n:'Bilik Simulasi Berani Berkata TIDAK',w:14,h:10,a:['#1f7a5a','#2a8c6a'],wl:'#10402f',ac:'#e8fff5',
+ D:[[7,9,'lobi',17,1,'Lobi']],
+ O:[['rug',4,3,'6x3'],['friend',7,3,'f'],['table',3,6],['table',10,6],['plant',1,1],['plant',12,1],['lamp',4,1],['lamp',9,1],['clue',1,8,'cl3']]},
+E:{n:'Bilik Kuiz Akhir',w:14,h:10,a:['#3a2a8c','#4636a5'],wl:'#161040',ac:'#ffd54a',
+ D:[[7,9,'lobi',10,12,'Lobi']],
+ O:[['rug',4,4,'6x3'],['quizm',7,3,'q'],['score',3,2,''],['plant',1,1],['plant',12,1],['lamp',5,1],['lamp',9,1],['plant',1,8],['plant',12,8]]}};
+const SOL=new Set(['plant','lamp','bench','shelf','table','npc','friend','quizm','board','map','chest','ex','st','score']);
+const IT=new Set(['npc','friend','quizm','board','map','chest','ex','st','clue','score']);
+const fresh=()=>({room:'lobi',k:{ex:[],st:[],sc:[],cl:[]},b:[],q:0,qs:0,talk:0});
+let S=fresh(),room,objs,solids,cam={x:0,y:0},P={x:0,y:0,d:2,m:0},K={},vk={},mode='menu',modal=false,fx=[],time=0,near=null,AC,snd=true,mi,stepT=0,fade=0,banner=0,pv={x:0,y:0},tcd=0;
+function loadRoom(id,sx,sy){room=R[id];S.room=id;objs=room.O;solids=new Set(objs.filter(o=>SOL.has(o[0])).map(o=>o[1]+','+o[2]));P.x=sx*T+16;P.y=sy*T+16;pv.x=P.x;pv.y=P.y;banner=3;fade=1}
+const doorAt=(x,y)=>room.D.find(d=>d[0]==x&&d[1]==y);
+function isSolid(x,y){if(x<0||y<0||x>=room.w||y>=room.h)return true;if((x==0||y==0||x==room.w-1||y==room.h-1)&&!doorAt(x,y))return true;return solids.has(x+','+y)}
+const hit=(x,y)=>[[-8,-3],[8,-3],[-8,8],[8,8]].some(([a,b])=>isSolid(Math.floor((x+a)/T),Math.floor((y+b)/T)));
+const total=()=>S.k.ex.length+S.k.st.length+S.k.sc.length,unlocked=()=>total()>=13;
+/* ===== BUNYI ===== */
+function beep(f,d,t,v,w){if(!snd)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),a=AC.createGain(),s=AC.currentTime+(w||0);o.type=t||'square';o.frequency.value=f;a.gain.value=v||.04;o.connect(a);a.connect(AC.destination);o.start(s);a.gain.setTargetAtTime(0,s+d*.6,d*.2);o.stop(s+d)}catch(e){}}
+const win=()=>[523,659,784,1047].forEach((f,i)=>beep(f,.18,'triangle',.06,i*.1));
+function music(on){clearInterval(mi);if(on&&snd){const n=[98,117,131,147,175,196];mi=setInterval(()=>beep(n[Math.floor(Math.random()*6)],1.8,'sine',.025),1500)}}
+function setSnd(v){snd=v;document.querySelectorAll('.snd').forEach(b=>b.textContent='Bunyi: '+(snd?'ON':'OFF'));music(snd&&mode=='play')}
+/* ===== PANEL ===== */
+function panel(t,h,btns){$('pt').textContent=t;$('pb').innerHTML=h;const b=$('pbtn');b.innerHTML='';(btns||[['Tutup',close,'x']]).forEach(([l,f,c])=>{const e=document.createElement('button');e.textContent=l;if(c)e.className=c;e.onclick=f;b.appendChild(e)});$('panel').classList.remove('hide');modal=true;document.body.classList.add('modal')}
+function close(){$('panel').classList.add('hide');modal=false;document.body.classList.remove('modal');save()}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.remove('hide');e.style.animation='none';void e.offsetWidth;e.style.animation='';clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.add('hide'),2600)}
+function say(name,lines,end){let i=0;(function n(){const last=i>=lines.length-1;panel(name,'<p>'+lines[i]+'</p>',[[last?'Tutup':'Seterusnya',()=>{if(last){close();end&&end()}else{i++;n()}},'ok']])})()}
+function icoCanvas(id){const c=$('ic');if(c){const x=c.getContext('2d');x.imageSmoothingEnabled=false;icon(x,id,48,50,2.6)}}
+/* ===== KEMAJUAN ===== */
+function objText(){const k=S.k;if(!S.talk)return 'Bercakap dengan Penjaga Galeri di lobi';if(k.ex.length<4)return 'Galeri Inhalan: '+k.ex.length+'/4 pameran';if(k.st.length<6)return 'Galeri Kesan: '+k.st.length+'/6 stesen';if(k.sc.length<3)return 'Bilik TIDAK: '+k.sc.length+'/3 situasi';if(!S.q)return 'Masuk Bilik Kuiz Akhir (pintu bawah lobi)';return 'Misi selesai! Juara Anti-Inhalan'}
+function hud(){$('obj').textContent=objText();$('fill').style.width=(total()/13*100)+'%';save()}
+function badge(n){if(!S.b.includes(n)){S.b.push(n);setTimeout(()=>{toast('Lencana baharu: '+n);win()},900)}}
+function got(kind,id){const a=S.k[kind];if(a.includes(id))return false;a.push(id);burst();beep(880,.15,'triangle',.06);toast('Buku Ilmu dikemas kini!');if(S.k.ex.length==4)badge('Penyiasat Bahan');if(S.k.st.length==6)badge('Doktor Kecil');if(S.k.sc.length==3)badge('Pahlawan TIDAK');if(unlocked()&&!got.u){got.u=1;setTimeout(()=>toast('Bilik Kuiz Akhir dibuka!'),1800)}hud();return true}
+function burst(){for(let i=0;i<16;i++)fx.push({x:P.x,y:P.y-12,vx:(Math.random()-.5)*140,vy:-30-Math.random()*90,l:1})}
+/* ===== INTERAKSI ===== */
+function act(){if(mode!='play'||modal||!near)return;const[k,,,id]=near;beep(520,.08);
+if(k=='npc'){if(!S.talk)say('Penjaga Galeri',['Selamat datang, Penyiasat Muda! Pusat pameran ini menyimpan rahsia bahaya penyalahgunaan inhalan.','Misi kamu: kumpulkan bukti di Galeri Inhalan, Galeri Kesan Kesihatan dan Bilik Simulasi Berkata TIDAK.','Berjalan dengan WASD atau anak panah, tekan E untuk menyiasat. Cari bintang berkilau yang tersembunyi!','Apabila semua bukti dikumpulkan, Bilik Kuiz Akhir akan dibuka. Semoga berjaya!'],()=>{S.talk=1;hud()});else say('Penjaga Galeri',[S.q?'Hebat! Kamu seorang Juara Anti-Inhalan. Ingat, sentiasa berkata TIDAK!':'Teruskan siasatan! '+objText()+'.'])}
+else if(k=='board')panel('Papan Misi',mis()+'<p>Bintang tersembunyi ditemui: '+S.k.cl.length+'/4</p>');
+else if(k=='map')panel('Peta Bangunan','<p>Dari <b>Lobi</b>, masuk melalui pintu di dinding atas:<br>Kiri: <b>Galeri Inhalan</b><br>Tengah: <b>Galeri Kesan Kesihatan</b><br>Kanan: <b>Bilik Simulasi TIDAK</b><br>Pintu bawah: <b>Bilik Kuiz Akhir</b> ('+(unlocked()?'terbuka':'terkunci')+')</p><p>Kamu kini di: <b>'+room.n+'</b></p>');
+else if(k=='chest'){const n=got('cl','cl0');panel('Buku Panduan','<p>Inhalan ialah bahan kimia meruap dalam produk harian seperti gam, petrol, thinner dan aerosol. Bahan ini tidak boleh dihidu atau disalahgunakan. Kita boleh berkata TIDAK!</p><p class="new">'+(n?'Petunjuk ditemui: '+CL[0]+'!':CL[0]+' sudah ada dalam Buku Ilmu.')+'</p>')}
+else if(k=='clue'){got('cl',id);panel('Petunjuk Rahsia!','<p class="new">Kamu menemui <b>'+CL[+id[2]]+'</b>! Ia disimpan dalam Buku Ilmu.</p>')}
+else if(k=='ex'||k=='st'){const d=(k=='ex'?EX:ST)[id],n=got(k,id);panel(d.t,'<canvas id="ic" width="96" height="96"></canvas><p>'+d.d+'</p>'+(n?'<p class="new">Maklumat baharu ditambah ke Buku Ilmu!</p>':''));icoCanvas(id)}
+else if(k=='friend')runSc(S.k.sc.length<3?S.k.sc.length:0);
+else if(k=='quizm'){if(!unlocked())return;say('Penguji',['Selamat datang ke Cabaran Akhir! Jawab 10 soalan. Jika salah, kamu boleh cuba lagi.'],()=>{S.qs=0;runQ(0,0)})}
+else if(k=='score')panel('Papan Skor','<p>Skor kuiz: <b>'+(S.q?S.qs+'/10':'belum cuba')+'</b></p><p>Lencana: <b>'+(S.b.join(', ')||'belum ada')+'</b></p><p>Bukti: '+total()+'/13 &nbsp; Bintang: '+S.k.cl.length+'/4</p>')}
+const mis=()=>{const k=S.k,c=(a,n)=>(a>=n?'<span class="good">Selesai</span>':a+'/'+n);return '<p>Galeri Inhalan: '+c(k.ex.length,4)+'<br>Galeri Kesan Kesihatan: '+c(k.st.length,6)+'<br>Bilik Simulasi TIDAK: '+c(k.sc.length,3)+'<br>Kuiz Akhir: '+(S.q?'<span class="good">Selesai</span>':unlocked()?'Terbuka':'Terkunci')+'</p>'};
+function runSc(i){const s=SC[i];panel('Simulasi TIDAK ('+(i+1)+'/3)','<p>'+s.f+'</p><p>Apakah tindakan paling selamat?</p>',s.o.map(([t,ok,fb])=>[t,()=>{if(ok){win();burst();got('sc','s'+i);panel('Betul! Bagus!','<p class="good">'+fb+'</p>',[[i<2?'Seterusnya':'Tutup',()=>{i<2?runSc(i+1):(close(),toast('Semua situasi selesai!'))},'ok']])}else{beep(150,.25,'sawtooth',.05);panel('Cuba lagi','<p class="bad">'+fb+'</p>',[['Cuba Lagi',()=>runSc(i),'on']])}}]))}
+function runQ(i,tr){if(i>=Q.length){S.q=1;badge(S.qs>=8?'Juara Anti-Inhalan':'Peserta Berani');hud();win();return panel('Keputusan Akhir','<p>Kamu betul <b>'+S.qs+'/10</b> pada percubaan pertama.</p><p>Lencana: <b>'+S.b.join(', ')+'</b></p><p><b>Rumusan:</b><br>1. Gam, petrol, thinner dan aerosol tertentu mempunyai bahan meruap berbahaya.<br>2. Penyalahgunaan boleh menyebabkan pening, loya, sukar bernafas, kerosakan otak dan organ, serta bahaya maut.<br>3. Berkata TIDAK, beredar dan beritahu orang dewasa dipercayai.</p>',[['Main Semula Kuiz',()=>{S.qs=0;runQ(0,0)},'on'],['Tutup',close,'x']])}
+const q=Q[i];panel('Soalan '+(i+1)+'/10','<p>'+q[0]+'</p>',q[1].map((t,j)=>[t,()=>{if(j==q[2]){if(!tr)S.qs++;win();burst();panel('Betul!','<p class="good">'+q[3]+'</p>',[[i<9?'Seterusnya':'Lihat Keputusan',()=>runQ(i+1,0),'ok']])}else{beep(150,.25,'sawtooth',.05);panel('Belum tepat','<p class="bad">'+q[3]+'</p>',[['Cuba Lagi',()=>runQ(i,1),'on']])}}]))}
+function book(tab){tab=tab||0;const k=S.k,e='<p>Belum ada maklumat. Teruskan meneroka!</p>';let h;
+if(tab==0)h=k.ex.map(i=>'<p><b>'+EX[i].t+'</b><br>'+EX[i].d+'</p>').join('')||e;
+if(tab==1)h=k.st.map(i=>'<p><b>'+ST[i].t+'</b><br>'+ST[i].d+'</p>').join('')||e;
+if(tab==2)h=k.sc.map(i=>'<p>&bull; '+SC[+i[1]].tip+'</p>').join('')||e;
+if(tab==3)h=CL.map((n,i)=>'<p>'+(k.cl.includes('cl'+i)?'<b class="good">'+n+'</b>':'??? (belum ditemui)')+'</p>').join('');
+if(tab==4)h=mis();
+panel('Buku Ilmu',h,['Inhalan','Kesan','Tolak','Petunjuk','Objektif'].map((t,i)=>[t,()=>book(i),i==tab?'on':'']).concat([[ 'Tutup',close,'x']]))}
+/* ===== SIMPAN & MENU ===== */
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}};
+function save(){if(mode!='play')return;try{S.px=P.x;S.py=P.y;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function begin(){mode='play';document.body.classList.add('play');setSnd(snd);hud()}
+function newGame(){S=fresh();got.u=0;loadRoom('lobi',10,10);begin();panel('Cara Bermain',how(),[['Mula Misi!',close,'ok']])}
+function cont(){const s=load();if(!s)return;S=Object.assign(fresh(),s);got.u=unlocked();loadRoom(S.room,0,0);P.x=S.px;P.y=S.py;begin()}
+function toMenu(){save();mode='menu';document.body.classList.remove('play');music(false);S=fresh();loadRoom('lobi',10,10);$('bCont').classList.toggle('hide',!load())}
+const how=()=>'<p><b>Komputer:</b> WASD / anak panah untuk berjalan, <b>E</b> untuk menyiasat, <b>ESC</b> untuk jeda atau tutup panel.</p><p><b>Telefon/tablet:</b> guna butang arah dan butang hijau <b>E</b>.</p><p>Berjalan ke pameran dan watak, tekan E. Cari bintang berkilau yang tersembunyi. Kumpul semua bukti untuk membuka Bilik Kuiz Akhir.</p>';
+/* ===== INPUT ===== */
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();K[k]=1;if(k=='e'){act()}if(k=='escape'){if(modal)close();else if(mode=='play')pause()}if(k.startsWith('arrow')||k==' ')e.preventDefault()});
+addEventListener('keyup',e=>K[e.key.toLowerCase()]=0);
+function pause(){panel('Jeda',how(),[['Sambung',close,'ok'],['Mula Semula',()=>{close();newGame()},'x'],['Menu Utama',()=>{close();toMenu()},'x']])}
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k,on=e=>{e.preventDefault();vk[k]=1},off=e=>{e.preventDefault();vk[k]=0};b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(v=>b.addEventListener(v,off))});
+$('bE').addEventListener('pointerdown',e=>{e.preventDefault();act()});
+$('bStart').onclick=newGame;$('bCont').onclick=cont;$('bHow').onclick=()=>panel('Cara Bermain',how());
+$('bAbout').onclick=()=>panel('Tentang Permainan','<p><b>Misi Eksplorasi Anti-Inhalan: Rahsia Galeri Terlarang</b><br>Pendidikan Kesihatan Tahun 3. Standard Pembelajaran 2.1.1, 2.1.2 dan 2.1.3: mengenal jenis bahan inhalan, kesan penyalahgunaan terhadap kesihatan diri dan kemahiran berkata TIDAK.</p>');
+$('bBook').onclick=()=>{if(mode=='play'&&!modal)book(0)};$('bMenu').onclick=()=>{if(mode=='play'&&!modal)pause()};
+document.querySelectorAll('.snd').forEach(b=>b.onclick=()=>setSnd(!snd));
+/* ===== KEMAS KINI ===== */
+function update(dt){const mw=room.w*T,mh=room.h*T;cam.x=mw<VW?-(VW-mw)/2:Math.max(0,Math.min(mw-VW,P.x-VW/2));cam.y=mh<VH?-(VH-mh)/2:Math.max(0,Math.min(mh-VH,P.y-VH/2));
+fx.forEach(f=>{f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=160*dt;f.l-=dt*1.2});fx=fx.filter(f=>f.l>0);fade=Math.max(0,fade-dt*2);banner=Math.max(0,banner-dt);tcd-=dt;
+if(mode!='play'||modal){$('prompt').classList.add('hide');return}
+const mx0=(K.d||K.arrowright||vk.r?1:0)-(K.a||K.arrowleft||vk.l?1:0),my0=(K.s||K.arrowdown||vk.d?1:0)-(K.w||K.arrowup||vk.u?1:0);pv.x=P.x;pv.y=P.y;
+if(mx0||my0){const l=Math.hypot(mx0,my0),mx=mx0/l,my=my0/l,s=95*dt;P.d=Math.abs(mx)>Math.abs(my)?(mx>0?1:3):(my>0?2:0);if(!hit(P.x+mx*s,P.y))P.x+=mx*s;if(!hit(P.x,P.y+my*s))P.y+=my*s;P.m+=dt;stepT-=dt;if(stepT<0){stepT=.3;beep(100,.06,'triangle',.05)}}else P.m=0;
+const d=doorAt(Math.floor(P.x/T),Math.floor(P.y/T));if(d){if(d[2]=='E'&&!unlocked()){P.x=pv.x;P.y=pv.y-3;if(tcd<=0){toast('Pintu terkunci! Kumpul semua bukti ('+total()+'/13)');tcd=2;beep(120,.3,'sawtooth',.05)}}else{beep(300,.15,'triangle',.06);beep(450,.15,'triangle',.06,.12);loadRoom(d[2],d[3],d[4]);hud()}}
+let best=null,bd=46;objs.forEach(o=>{if(!IT.has(o[0]))return;if(o[0]=='clue'&&S.k.cl.includes(o[3]))return;const dd=Math.hypot(P.x-o[1]*T-16,P.y-o[2]*T-16);if(dd<bd){bd=dd;best=o}});near=best;
+const p=$('prompt');if(best){p.textContent=best[0]=='quizm'&&!unlocked()?'Terkunci':(matchMedia('(pointer:coarse)').matches?'Tekan butang E':'Tekan E')+(best[0]=='npc'||best[0]=='friend'||best[0]=='quizm'?' untuk bercakap':' untuk menyiasat');p.classList.remove('hide')}else p.classList.add('hide')}
+/* ===== LUKISAN ===== */
+function icon(c,id,x,y,s){c.save();c.translate(x,y);c.scale(s,s);const r=(a,b,w,h,f)=>{c.fillStyle=f;c.fillRect(a,b,w,h)},o=(a,b,rx,ry,f)=>{c.fillStyle=f;c.beginPath();c.ellipse(a,b,rx,ry,0,0,7);c.fill()};
+({gam(){r(-5,-12,10,22,'#f2c94c');r(-3,-16,6,5,'#d33');r(-4,-3,8,7,'#fff')},petrol(){r(-10,-8,20,18,'#c0392b');r(-10,-13,8,5,'#922');r(4,-14,5,7,'#ddd');r(-6,-3,12,6,'#f2c94c')},thinner(){r(-8,-10,16,22,'#8d99a6');r(-6,-4,12,9,'#fff');r(-3,-14,6,4,'#333')},aerosol(){r(-6,-8,12,22,'#3fa7d6');r(-5,-12,10,4,'#ddd');r(-2,-16,4,4,'#222');r(-6,2,12,5,'#fff')},
+kepala(){o(0,0,11,12,'#f5c9a0');r(-6,-3,3,3,'#222');r(3,-3,3,3,'#222');r(-4,5,8,2,'#a33');r(-15,-14,4,4,'#ffd54a');r(11,-14,4,4,'#ffd54a')},perut(){o(0,0,12,10,'#f08a8a');r(-3,-9,6,5,'#c55');r(-6,2,12,2,'#c55')},paru(){o(-6,0,6,11,'#5aa9e6');o(6,0,6,11,'#5aa9e6');r(-1,-13,2,10,'#ddd')},otak(){o(-5,0,8,9,'#f7a1c4');o(5,0,8,9,'#f7a1c4');r(0,-8,1,16,'#c5648f')},organ(){o(0,0,13,8,'#9c4a2e');o(6,-2,6,5,'#b8603f')},pengsan(){o(0,4,9,9,'#f5c9a0');r(-5,3,3,2,'#222');r(2,3,3,2,'#222');c.fillStyle='#fff';c.font='bold 9px sans-serif';c.fillText('Z z',5,-6)}})[id]();c.restore()}
+function glow(x,y,r,col){g.save();g.globalCompositeOperation='lighter';const q=g.createRadialGradient(x,y,2,x,y,r);q.addColorStop(0,col||'rgba(255,200,110,.4)');q.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=q;g.fillRect(x-r,y-r,r*2,r*2);g.restore()}
+function person(x,y,d,f,sh,hr){const w=f%2;g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(x,y,9,4,0,0,7);g.fill();R_(x-6,y-7+w,5,7-w,'#2a3050');R_(x+1,y-7+1-w,5,7-(1-w),'#2a3050');R_(x-7,y-18,14,11,sh);
+if(d==1||d==3){R_(x-2+(w?2:-2),y-17,4,8,'#f1c27d')}else{R_(x-10,y-17+w*2,3,8,sh);R_(x+7,y-17+(1-w)*2,3,8,sh)}
+R_(x-6,y-29,12,11,'#f1c27d');R_(x-7,y-31,14,d==0?12:5,hr);if(d==2){R_(x-4,y-24,2,3,'#222');R_(x+2,y-24,2,3,'#222')}if(d==1)R_(x+2,y-24,2,3,'#222');if(d==3)R_(x-4,y-24,2,3,'#222')}
+function drawObj(o,t){const[k,x,y,id]=o,px=x*T,py=y*T;switch(k){
+case 'plant':R_(px+10,py+20,12,10,'#8b5a2b');R_(px+6,py+6,20,16,'#2e9e4f');R_(px+10,py+2,12,12,'#47c46b');break;
+case 'lamp':R_(px+14,py+8,4,22,'#555');R_(px+9,py+2,14,8,'#ffd77a');glow(px+16,py+8,56+Math.sin(t*3+x)*8);break;
+case 'bench':R_(px+2,py+14,28,8,'#8a5a33');R_(px+4,py+22,4,6,'#5a3a20');R_(px+24,py+22,4,6,'#5a3a20');break;
+case 'shelf':R_(px+1,py+2,30,28,'#6a4a2a');for(let i=0;i<3;i++)R_(px+4,py+5+i*9,24,6,['#d44','#4a9','#fc4'][i]);break;
+case 'table':R_(px+2,py+8,28,18,'#a0703a');R_(px+4,py+10,24,6,'#c18d52');break;
+case 'board':R_(px+2,py+2,28,22,'#5a3a1e');R_(px+5,py+5,22,16,'#f4e9c8');R_(px+8,py+9,16,2,'#c33');R_(px+8,py+14,12,2,'#555');R_(px+14,py+24,4,6,'#5a3a1e');break;
+case 'map':R_(px+2,py+3,28,22,'#2b6cb0');R_(px+5,py+6,22,16,'#cfe8ff');R_(px+8,py+9,6,5,'#4a9');R_(px+16,py+14,8,5,'#f2c94c');R_(px+14,py+25,4,5,'#555');break;
+case 'chest':R_(px+3,py+12,26,16,'#8a5a1e');R_(px+3,py+8,26,8,'#b07a2a');R_(px+14,py+14,4,6,'#ffd54a');break;
+case 'score':R_(px+4,py+4,24,20,'#222a60');R_(px+7,py+8,18,3,'#ffd54a');R_(px+7,py+14,12,3,'#6fe39a');R_(px+14,py+24,4,6,'#555');break;
+case 'ex':R_(px+4,py+20,24,10,'#d9d9e6');R_(px+2,py+26,28,4,'#9aa');if(!S.k.ex.includes(id))glow(px+16,py+12,26,'rgba(255,240,120,.35)');icon(g,id,px+16,py+12,.85);break;
+case 'st':{const c=ST[id].c,f=S.k.st.includes(id);R_(px+2,py+2,28,28,'#1a1030');R_(px+3,py+3,26,26,c);R_(px+5,py+5,22,22,'#1a1030');if(!f)glow(px+16,py+16,30,'rgba(255,255,255,.25)');icon(g,id,px+16,py+16,.7);break}
+case 'npc':person(px+16,py+26,2,Math.sin(t*2)>0?1:0,'#8e44ad','#f2c94c');break;
+case 'friend':person(px+16,py+26,2,Math.sin(t*2)>0?1:0,'#e67e22','#3a2a1a');break;
+case 'quizm':person(px+16,py+26,2,Math.sin(t*2)>0?1:0,'#2c82c9','#fff');R_(px+10,py-8,12,5,'#ffd54a');break;
+case 'clue':{const dd=Math.hypot(P.x-px-16,P.y-py-16);if(S.k.cl.includes(id)||dd>150)break;const a=Math.sin(t*6)*.3+.7;g.globalAlpha=a;R_(px+14,py+10,4,12,'#fff6a0');R_(px+10,py+14,12,4,'#fff6a0');g.globalAlpha=1;glow(px+16,py+16,22,'rgba(255,255,120,.4)')}}
+if((k=='ex'&&!S.k.ex.includes(id))||(k=='st'&&!S.k.st.includes(id))||k=='friend'||k=='npc'||(k=='quizm'&&unlocked())){const b=Math.sin(t*4)*2;R_(px+14,py-10+b,4,4,'#ffd54a');R_(px+12,py-8+b,8,0,'#ffd54a')}}
+function drawDoor(d,t){const x=d[0]*T,y=d[1]*T,lock=d[2]=='E'&&!unlocked(),open=!lock&&Math.hypot(P.x-x-16,P.y-y-16)<60;R_(x,y,T,T,room.wl);R_(x+1,y+1,30,30,room.ac);R_(x+4,y+4,24,24,lock?'#7a2230':open?'#fff6c8':'#6b4423');if(!open&&!lock){R_(x+22,y+16,3,3,'#ffd54a')}if(lock)R_(x+11,y+13,10,9,'#ddd');if(open)glow(x+16,y+16,36,'rgba(255,240,180,.4)');
+g.font='bold 8px sans-serif';g.textAlign='center';g.fillStyle='#000';const ly=d[1]==0?y+T+10:y-3;g.fillText(d[5],x+17,ly+1);g.fillStyle='#fff';g.fillText(d[5],x+16,ly)}
+function drawRoom(t){for(let ty=0;ty<room.h;ty++)for(let tx=0;tx<room.w;tx++){const x=tx*T,y=ty*T;if(tx==0||ty==0||tx==room.w-1||ty==room.h-1){if(doorAt(tx,ty))continue;R_(x,y,T,T,room.wl);R_(x,y,T,3,room.ac);R_(x,y+15,T,1,'rgba(255,255,255,.08)');R_(x+(ty%2?8:20),y+3,1,12,'rgba(255,255,255,.08)')}else{R_(x,y,T,T,room.a[(tx+ty)&1]);R_(x,y,T,1,'rgba(255,255,255,.05)')}}
+room.D.forEach(d=>drawDoor(d,t));objs.filter(o=>o[0]=='rug').forEach(o=>{const[w,h]=o[3].split('x');R_(o[1]*T,o[2]*T,w*T,h*T,room.ac+'33');R_(o[1]*T+4,o[2]*T+4,w*T-8,h*T-8,room.ac+'22')})}
+function draw(){const t=time;g.setTransform(1,0,0,1,0,0);g.textAlign='left';R_(0,0,VW,VH,'#05061a');g.save();g.translate(-Math.round(cam.x),-Math.round(cam.y));drawRoom(t);
+const L=objs.filter(o=>o[0]!='rug').map(o=>({y:o[2]*T+T,f:()=>drawObj(o,t)}));L.push({y:P.y+8,f:()=>person(P.x,P.y+8,P.d,P.m>0?Math.floor(P.m*8):0,'#2ecc71','#3a2410')});L.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
+fx.forEach(f=>{g.globalAlpha=Math.max(0,f.l);R_(f.x,f.y,4,4,'#ffe066');g.globalAlpha=1});g.restore();
+const px=P.x-cam.x,py=P.y-cam.y,q=g.createRadialGradient(px,py,60,px,py,250);q.addColorStop(0,'rgba(5,5,30,0)');q.addColorStop(1,'rgba(5,5,30,.5)');g.fillStyle=q;g.fillRect(0,0,VW,VH);
+if(mode=='play'){mini();if(banner>0){g.globalAlpha=Math.min(1,banner);R_(VW/2-130,VH-40,260,24,'rgba(13,16,48,.85)');g.fillStyle='#ffd54a';g.font='bold 13px sans-serif';g.textAlign='center';g.fillText(room.n,VW/2,VH-23);g.globalAlpha=1}}
+if(fade>0){g.globalAlpha=fade;R_(0,0,VW,VH,'#000');g.globalAlpha=1}}
+function mini(){const s=Math.min(66/room.w,44/room.h),ox=VW-76,oy=6,w=room.w*s,h=room.h*s;R_(ox-4,oy-3,74,h+18,'rgba(5,6,26,.78)');g.strokeStyle=room.ac;g.lineWidth=1;g.strokeRect(ox,oy,w,h);room.D.forEach(d=>R_(ox+d[0]*s-1,oy+d[1]*s-1,3,3,d[2]=='E'&&!unlocked()?'#f55':'#fff'));R_(ox+P.x/T*s-2,oy+P.y/T*s-2,4,4,'#6fe39a');g.fillStyle='#fff';g.font='7px sans-serif';g.textAlign='left';g.fillText(room.n.slice(0,16),ox,oy+h+10)}
+/* ===== LOOP ===== */
+let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;time+=dt;update(dt);draw();requestAnimationFrame(loop)}
+g.imageSmoothingEnabled=false;loadRoom('lobi',10,10);fade=0;$('bCont').classList.toggle('hide',!load());requestAnimationFrame(loop);
+</script>
+</body></html>
